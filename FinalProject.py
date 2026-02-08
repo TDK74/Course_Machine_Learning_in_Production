@@ -45,3 +45,31 @@ model.summary()
 model.get_compile_config()
 
 ## ------------------------------------------------------ ##
+topic_lookup = tf.keras.layers.StringLookup(vocabulary = f'{vocab_dir}/labels.txt',
+                                            num_oov_indices = 0)
+
+topic_lookup.get_vocabulary()
+
+## ------------------------------------------------------ ##
+MAX_LENGTH = 20
+VOCAB_SIZE = 10000
+
+title_preprocessor = tf.keras.layers.TextVectorization(max_tokens = VOCAB_SIZE,
+                                                        output_sequence_length = MAX_LENGTH)
+
+title_preprocessor.load_assets(vocab_dir)
+
+print(f'vocabulary size: {title_preprocessor.vocabulary_size()}')
+
+sample_title = train_df['title'][10]
+
+print(f"sample text: {sample_title}")
+
+print(f"sample text (preprocessed): {title_preprocessor(sample_title)}")
+
+## ------------------------------------------------------ ##
+test_ds = lab_utils.df_to_tfdata(test_df, topic_lookup, title_preprocessor)
+
+model.evaluate(test_ds)
+
+## ------------------------------------------------------ ##
