@@ -73,3 +73,21 @@ test_ds = lab_utils.df_to_tfdata(test_df, topic_lookup, title_preprocessor)
 model.evaluate(test_ds)
 
 ## ------------------------------------------------------ ##
+train_df.topic.value_counts(normalize = True).sort_index().mul(100).round(1).astype(str) + '%'
+
+## ------------------------------------------------------ ##
+test_df.topic.value_counts(normalize = True).sort_index().mul(100).round(1).astype(str) + '%'
+
+## ------------------------------------------------------ ##
+train_df = pd.read_csv(f'{data_dir}/train_data.csv')
+test_df = pd.read_csv(f'{data_dir}/test_data.csv')
+
+combined_df = pd.concat([train_df, test_df], ignore_index = True)
+
+train_df, temp_df = train_test_split(combined_df, test_size = 0.4, stratify = combined_df['topic'],
+                                    random_state = 42)
+
+dev_df, test_df = train_test_split(temp_df, test_size = 0.5, stratify = temp_df['topic'],
+                                    random_state = 42)
+
+## ------------------------------------------------------ ##
