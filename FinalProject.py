@@ -91,3 +91,27 @@ dev_df, test_df = train_test_split(temp_df, test_size = 0.5, stratify = temp_df[
                                     random_state = 42)
 
 ## ------------------------------------------------------ ##
+# or in this way:
+train_df, test_df = train_test_split(combined_df, test_size = 0.2, stratify = combined_df['topic'])
+
+train_df, dev_df = train_test_split(train_df, test_size = 0.25, stratify = train_df['topic'])
+
+## ------------------------------------------------------ ##
+train_df.topic.value_counts(normalize = True).sort_index().mul(100).round(1).astype(str) + '%'
+
+## ------------------------------------------------------ ##
+dev_df.topic.value_counts(normalize = True).sort_index().mul(100).round(1).astype(str) + '%'
+
+## ------------------------------------------------------ ##
+test_df.topic.value_counts(normalize = True).sort_index().mul(100).round(1).astype(str) + '%'
+
+## ------------------------------------------------------ ##
+BASE_DIR = './E2'
+
+data_dir, model_dir, vocab_dir = lab_utils.set_experiment_dirs(BASE_DIR)
+
+lab_utils.save_data(train_df, data_dir, 'train_data.csv')
+lab_utils.save_data(dev_df, data_dir, 'dev_data.csv')
+lab_utils.save_data(test_df, data_dir, 'test_data.csv')
+
+lab_utils.save_labels(topic_lookup, vocab_dir)
