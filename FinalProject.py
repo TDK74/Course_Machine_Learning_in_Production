@@ -115,3 +115,29 @@ lab_utils.save_data(dev_df, data_dir, 'dev_data.csv')
 lab_utils.save_data(test_df, data_dir, 'test_data.csv')
 
 lab_utils.save_labels(topic_lookup, vocab_dir)
+
+## ------------------------------------------------------ ##
+BASE_DIR = './E1'
+
+_, model_dir, _ = lab_utils.set_experiment_dirs(BASE_DIR)
+
+model = tf.keras.models.load_model(model_dir)
+
+BASE_DIR = './E2'
+
+MAX_LENGTH = 20
+VOCAB_SIZE = 10000
+
+data_dir, model_dir, vocab_dir = lab_utils.set_experiment_dirs(BASE_DIR)
+
+train_df = pd.read_csv(f'{data_dir}/train_data.csv')
+dev_df = pd.read_csv(f'{data_dir}/dev_data.csv')
+test_df = pd.read_csv(f'{data_dir}/test_data.csv')
+
+title_preprocessor = tf.keras.layers.TextVectorization(max_tokens = VOCAB_SIZE,
+                                                        output_sequence_length = MAX_LENGTH)
+
+topic_lookup = tf.keras.layers.StringLookup(vocabulary = f'{vocab_dir}/labels.txt',
+                                            num_oov_indices = 0)
+
+## ------------------------------------------------------ ##
