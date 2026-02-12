@@ -141,3 +141,27 @@ topic_lookup = tf.keras.layers.StringLookup(vocabulary = f'{vocab_dir}/labels.tx
                                             num_oov_indices = 0)
 
 ## ------------------------------------------------------ ##
+train_inputs = train_df['title']
+
+title_preprocessor.adapt(train_inputs)
+
+lab_utils.save_vocab(title_preprocessor, vocab_dir)
+
+## ------------------------------------------------------ ##
+NUM_EPOCHS = 5
+
+train_ds = lab_utils.df_to_tfdata(train_df, topic_lookup, title_preprocessor, shuffle = True)
+dev_ds = lab_utils.df_to_tfdata(dev_df, topic_lookup, title_preprocessor)
+test_ds = lab_utils.df_to_tfdata(test_df, topic_lookup, title_preprocessor)
+
+model = lab_utils.model_reset_weights(model)
+
+model.fit(train_ds, epochs = NUM_EPOCHS, validation_data = dev_ds, verbose = 1)
+
+## ------------------------------------------------------ ##
+model.evaluate(test_ds)
+
+## ------------------------------------------------------ ##
+model.save(model_dir)
+
+## ------------------------------------------------------ ##
