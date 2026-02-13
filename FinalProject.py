@@ -165,3 +165,32 @@ model.evaluate(test_ds)
 model.save(model_dir)
 
 ## ------------------------------------------------------ ##
+topics = topic_lookup.get_vocabulary()
+
+lab_utils.print_metric_per_topic(dev_df, topics, topic_lookup, title_preprocessor, model)
+
+## ------------------------------------------------------ ##
+train_df[train_df.topic == 'BUSINESS']
+
+## ------------------------------------------------------ ##
+BASE_DIR = './E3'
+
+data_dir, model_dir, vocab_dir = lab_utils.set_experiment_dirs(BASE_DIR)
+
+combined_df = pd.read_csv(f'./.backup.csv')
+
+train_df, test_df = train_test_split(combined_df, test_size = 0.2, stratify = combined_df['topic'])
+train_df, dev_df = train_test_split(train_df, test_size = 0.25, stratify = train_df['topic'])
+
+lab_utils.save_data(train_df, data_dir, 'train_data.csv')
+lab_utils.save_data(dev_df, data_dir, 'dev_data.csv')
+lab_utils.save_data(test_df, data_dir, 'test_data.csv')
+
+## ------------------------------------------------------ ##
+train_inputs = train_df['title']
+title_preprocessor.adapt(train_inputs)
+
+lab_utils.save_vocab(title_preprocessor, vocab_dir)
+lab_utils.save_labels(topic_lookup, vocab_dir)
+
+## ------------------------------------------------------ ##
