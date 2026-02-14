@@ -194,3 +194,25 @@ lab_utils.save_vocab(title_preprocessor, vocab_dir)
 lab_utils.save_labels(topic_lookup, vocab_dir)
 
 ## ------------------------------------------------------ ##
+NUM_EPOCHS = 5
+
+train_ds = lab_utils.df_to_tfdata(train_df, topic_lookup, title_preprocessor, shuffle = True)
+dev_ds = lab_utils.df_to_tfdata(dev_df, topic_lookup, title_preprocessor)
+test_ds = lab_utils.df_to_tfdata(test_df, topic_lookup, title_preprocessor)
+
+model = lab_utils.model_reset_weights(model)
+
+model.fit(train_ds, epochs = NUM_EPOCHS, validation_data = dev_ds, verbose = 1)
+
+## ------------------------------------------------------ ##
+model.evaluate(test_ds)
+
+model.save(model_dir)
+
+## ------------------------------------------------------ ##
+lab_utils.print_metric_per_topic(dev_df, topics, topic_lookup, title_preprocessor, model)
+
+## ------------------------------------------------------ ##
+lab_utils.get_errors(model, dev_df, title_preprocessor, topic_lookup, 'NATION')
+
+## ------------------------------------------------------ ##
