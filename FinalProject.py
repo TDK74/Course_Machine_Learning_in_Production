@@ -216,3 +216,27 @@ lab_utils.print_metric_per_topic(dev_df, topics, topic_lookup, title_preprocesso
 lab_utils.get_errors(model, dev_df, title_preprocessor, topic_lookup, 'NATION')
 
 ## ------------------------------------------------------ ##
+model.compile(loss = 'sparse_categorical_crossentropy', optimizer = 'adam',
+              metrics = [tf.keras.metrics.SparseTopKCategoricalAccuracy(k = 2)])
+
+model.evaluate(dev_ds)
+
+## ------------------------------------------------------ ##
+lab_utils.print_metric_per_topic(dev_df, topics, topic_lookup, title_preprocessor, model)
+
+## ------------------------------------------------------ ##
+EMBEDDING_DIM = 24
+DENSE_DIM = 24
+topic_size = topic_lookup.vocabulary_size()
+
+model = tf.keras.Sequential([tf.keras.layers.Embedding(VOCAB_SIZE, EMBEDDING_DIM,
+                                                        input_length = MAX_LENGTH),
+                            tf.keras.layers.Dense(DENSE_DIM, activation = 'relu'),
+                            tf.keras.layers.Dense(topic_size, activation = 'softmax')])
+
+model.compile(loss = 'sparse_categorical_crossentropy', optimizer = 'adam',
+            metrics = ['sparse_categorical_accuracy'])
+
+model.summary()
+
+## ------------------------------------------------------ ##
