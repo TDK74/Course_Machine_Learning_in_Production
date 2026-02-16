@@ -1,5 +1,12 @@
+import json
+import os
+import shutil
+import sqlite3
 import lab_utils
+import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
+import requests
 import tensorflow as tf
 
 from sklearn.model_selection import train_test_split
@@ -238,5 +245,25 @@ model.compile(loss = 'sparse_categorical_crossentropy', optimizer = 'adam',
             metrics = ['sparse_categorical_accuracy'])
 
 model.summary()
+
+## ------------------------------------------------------ ##
+# Uncomment the lines below if you ran this section before and
+# want to DELETE all models in the serving directory
+
+# SERVING_DIR = f'{os.getcwd()}/serving'
+# os.environ["SERVING_DIR"] = SERVING_DIR
+# os.system('find $SERVING_DIR -maxdepth 1 -mindepth 1 -type d -exec rm -rf {} \;')
+
+## ------------------------------------------------------ ##
+SERVING_DIR = f'{os.getcwd()}/serving'
+os.environ["SERVING_DIR"] = SERVING_DIR
+
+print(f'SERVING_DIR: {SERVING_DIR}')
+print(f'os.environ["SERVING_DIR"]: {os.environ["SERVING_DIR"]}')
+
+## ------------------------------------------------------ ##
+os.makedirs(f'{SERVING_DIR}/1', exist_ok = True)
+
+shutil.copytree('./E2/model/', f'{SERVING_DIR}/1', dirs_exist_ok = True)
 
 ## ------------------------------------------------------ ##
