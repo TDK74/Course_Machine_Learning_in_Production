@@ -267,3 +267,52 @@ os.makedirs(f'{SERVING_DIR}/1', exist_ok = True)
 shutil.copytree('./E2/model/', f'{SERVING_DIR}/1', dirs_exist_ok = True)
 
 ## ------------------------------------------------------ ##
+## NOTE: If you're running this notebook outside the DeepLearning.AI platform
+## and want to use Docker instead.
+
+# command = ('docker run -p 8501:8501 --mount type=bind,source="${SERVING_DIR}",'
+#             'target=/models/newsapp_model -e MODEL_NAME=newsapp_model '
+#             '--name=tensorflow-serving -t tensorflow/serving &')
+
+# os.system(command)
+
+## ------------------------------------------------------ ##
+command = (f'nohup tensorflow_model_server --rest_api_port=8501 --model_name=newsapp_model '
+            f'--model_base_path="{SERVING_DIR}" > ./serving/server.log 2>&1 &')
+
+os.system(command)
+
+## ------------------------------------------------------ ##
+json_payload = '{"instances": [[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]]}'
+
+command = (f"curl -d '{json_payload}' http://localhost:8501/v1/models/newsapp_model:predict")
+
+os.system(command)
+
+## ------------------------------------------------------ ##
+MAX_LENGTH = 20
+VOCAB_SIZE = 10000
+
+title_preprocessor = tf.keras.layers.TextVectorization(max_tokens = VOCAB_SIZE,
+                                                       output_sequence_length = MAX_LENGTH)
+
+title_preprocessor.load_assets('./E2/vocab')
+
+sample_input = 'Sample title'
+
+sample_input_ds = title_preprocessor(sample_input)
+
+sample_input_ds = tf.expand_dims(sample_input_ds, axis = 0)
+
+data = json.dumps({"instances" : sample_input_ds.numpy().tolist()})
+
+headers = {"content-type" : "application/json"}
+
+json_response = requests.post('http://localhost:8501/v1/models/newsapp_model:predict',
+                                data = data, headers = headers)
+
+predictions = json.loads(json_response.text)['predictions']
+
+print(predictions)
+
+## ------------------------------------------------------ ##
