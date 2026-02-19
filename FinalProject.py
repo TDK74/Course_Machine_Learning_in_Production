@@ -316,3 +316,36 @@ predictions = json.loads(json_response.text)['predictions']
 print(predictions)
 
 ## ------------------------------------------------------ ##
+BASE_DIR = './E2'
+
+data_dir, model_dir, vocab_dir = lab_utils.set_experiment_dirs(BASE_DIR)
+
+model = tf.keras.models.load_model(model_dir)
+
+title_preprocessor = tf.keras.layers.TextVectorization(max_tokens = VOCAB_SIZE,
+                                                       output_sequence_length = MAX_LENGTH)
+
+title_preprocessor.load_assets(vocab_dir)
+
+model_with_preprocessor = tf.keras.Sequential([title_preprocessor, model])
+
+sample_input = "Sample Title"
+
+model_with_preprocessor.predict([sample_input])
+
+## ------------------------------------------------------ ##
+model_with_preprocessor.export(f'{SERVING_DIR}/2')
+
+## ------------------------------------------------------ ##
+data = json.dumps({"instances" : ["sample title"]})
+
+headers = {"content-type" : "application/json"}
+
+json_response = requests.post('http://localhost:8501/v1/models/newsapp_model:predict',
+                                data = data, headers = headers)
+
+predictions = json.loads(json_response.text)['predictions']
+
+print(predictions)
+
+## ------------------------------------------------------ ##
