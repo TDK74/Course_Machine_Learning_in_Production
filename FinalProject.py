@@ -349,3 +349,60 @@ predictions = json.loads(json_response.text)['predictions']
 print(predictions)
 
 ## ------------------------------------------------------ ##
+## NOTE: Uncomment and run this cell if you're running on your own device
+## and want to use Docker instead.
+
+# command = ('docker stop tensorflow-serving')
+
+# os.system(command)
+
+## ------------------------------------------------------ ##
+command = ("kill $(ps aux | grep 'tensorflow_model_server' | awk '{print $2}')")
+
+# or shorter and safer
+# command = "pkill -f tensorflow_model_server"
+
+os.system(command)
+
+## ------------------------------------------------------ ##
+## NOTE: Copy and uncomment this on a new cell. This will NOT run on the DeepLearning.AI platform.
+
+# command = ('docker run -p 8501:8501 --mount type=bind,source="${SERVING_DIR}",' +
+#             'target=/models/newsapp_model --mount type=bind,' +
+#             'source="${SERVING_DIR}/models.config-docker",target=/models/models.config ' +
+#             '-e MODEL_NAME=newsapp_model --name=tensorflow-serving-models-config -t ' +
+#             'tensorflow/serving --model_config_file=/models/models.config ' +
+#             '--allow_version_labels_for_unavailable_models=true &')
+
+# os.system(command)
+
+## ------------------------------------------------------ ##
+command = (f'nohup tensorflow_model_server --rest_api_port=8501 '
+            f'--model_config_file="${SERVING_DIR}/models.config" '
+            f'--model_config_file_poll_wait_seconds=10 '
+            f'--allow_version_labels_for_unavailable_models=true '
+            f'--model_base_path="{SERVING_DIR}" > ./serving/server.log 2>&1 &')
+
+os.system(command)
+
+## ------------------------------------------------------ ##
+data = json.dumps({"instances" : [[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]]})
+
+headers = {"content-type" : "application/json"}
+local_addr = 'http://localhost:8501/v1/models/newsapp_model/labels/deprecated:predict'
+json_response = requests.post(local_addr, data = data, headers = headers)
+predictions = json.loads(json_response.text)['predictions']
+
+print(predictions)
+
+## ------------------------------------------------------ ##
+data = json.dumps({"instances" : ["sample title 1", "sample title 2"]})
+
+headers = {"content-type" : "application/json"}
+json_response = requests.post('http://localhost:8501/v1/models/newsapp_model/labels/stable:predict',
+                                data = data, headers = headers)
+predictions = json.loads(json_response.text)['predictions']
+
+print(predictions)
+
+## ------------------------------------------------------ ##
