@@ -406,3 +406,51 @@ predictions = json.loads(json_response.text)['predictions']
 print(predictions)
 
 ## ------------------------------------------------------ ##
+BASE_DIR = './E2'
+
+data_dir, _, vocab_dir = lab_utils.set_experiment_dirs(BASE_DIR)
+
+dev_df = pd.read_csv(f'{data_dir}/dev_data.csv')
+
+topic_lookup = tf.keras.layers.StringLookup(vocabulary = f'{vocab_dir}/labels.txt',
+                                            num_oov_indices = 0)
+
+title_df = dev_df['title'][ : 100].reset_index(drop = True)
+
+dev_np = title_df.to_numpy().tolist()
+
+data = json.dumps({"instances" : dev_np})
+
+headers = {"content-type" : "application/json"}
+
+json_response = requests.post('http://localhost:8501/v1/models/newsapp_model/labels/stable:predict',
+                                data = data, headers = headers)
+
+predictions = json.loads(json_response.text)['predictions']
+
+## ------------------------------------------------------ ##
+pd.options.display.float_format = '{:.2%}'.format
+
+pred_df = pd.DataFrame(predictions, columns = topic_lookup.get_vocabulary())
+
+pred_df = pd.concat([title_df, pred_df], axis = 1)
+
+pred_df
+
+## ------------------------------------------------------ ##
+THRESHOLD = 0.6
+
+below_threshold = []
+
+for i, prediction in enumerate(predictions):
+    if max(prediction) < THRESHOLD:
+        prediction = prediction.copy()
+        prediction.insert(0, dev_np[i])
+        below_threshold.append(prediction)
+
+columns = topic_lookup.get_vocabulary()
+columns.insert(0, 'title')
+
+pd.DataFrame(below_threshold, columns = columns)
+
+## ------------------------------------------------------ ##
