@@ -454,3 +454,42 @@ columns.insert(0, 'title')
 pd.DataFrame(below_threshold, columns = columns)
 
 ## ------------------------------------------------------ ##
+con = sqlite3.connect("news_articles.db")
+cur = con.cursor()
+
+for row in cur.execute("SELECT id,title FROM news_articles WHERE id < 5"):
+    print(row)
+
+## ------------------------------------------------------ ##
+VOCAB_SIZE = 10000
+MAX_LENGTH = 20
+
+BASE_DIR = './E1'
+
+_, model_dir, vocab_dir = lab_utils.set_experiment_dirs(BASE_DIR)
+
+model = tf.keras.models.load_model(model_dir)
+
+title_preprocessor = tf.keras.layers.TextVectorization(max_tokens = VOCAB_SIZE,
+                                                        output_sequence_length = MAX_LENGTH)
+
+title_preprocessor.load_assets(vocab_dir)
+
+## ------------------------------------------------------ ##
+unk_counts = []
+
+for row in cur.execute("SELECT title FROM news_articles"):
+    sequence = title_preprocessor(row[0])
+
+    unk_count = np.count_nonzero(sequence == 1)
+
+    unk_counts.append(unk_count)
+
+## ------------------------------------------------------ ##
+ids = range(1, len(unk_counts) + 1)
+
+plt.plot(ids, unk_counts)
+
+## ------------------------------------------------------ ##
+for row in cur.execute("SELECT id,title FROM news_articles WHERE ID > 100"):
+    print(row)
