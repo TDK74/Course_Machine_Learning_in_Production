@@ -1,9 +1,10 @@
 # Course: Machine Learning in Production
 
 ### Acknowledgments
-The Python code is from the course "Machine Learning in Production" on DeepLearning.AI. The course content is available for free, while the certificate and graded assessments require a paid subscription.  
+The Python code is from the course "Machine Learning in Production" on DeepLearning.AI.  
+The course content is available for free, while the certificate and graded assessments require a paid subscription.  
 For more details, visit:  
-<https://learn.deeplearning.ai/courses/machine-learning-in-production/information>
+<https://learn.deeplearning.ai/courses/machine-learning-in-production/information/>
 
 ### Description
 This repository contains only Python code from my practice after each lesson.  
